@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script src="http://d3js.org/d3.v3.min.js"></script>
+<script src="http://d3js.org/topojson.v1.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/topojson/1.1.0/topojson.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+<script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
+<link rel="stylesheet" href="sheets.css" type="text/css">
+<link rel="stylesheet">
+</head>
+<style>
+
+
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+.bar {
+  fill: orange;
+}
+
+.bar:hover {
+  fill: orangered ;
+}
+
+.x.axis path {
+  display: none;
+}
+
+.d3-tip {
+  line-height: 1;
+  font-weight: bold;
+  padding: 12px;
+  background: rgba(0, 0, 0, 0.8);
+  color: #fff;
+  border-radius: 2px;
+}
+
+/* Creates a small triangle extender for the tooltip */
+.d3-tip:after {
+  box-sizing: border-box;
+  display: inline;
+  font-size: 10px;
+  width: 100%;
+  line-height: 1;
+  color: rgba(0, 0, 0, 0.8);
+  content: "\25BC";
+  position: absolute;
+  text-align: center;
+}
+
+/* Style northward tooltips differently */
+.d3-tip.n:after {
+  margin: -1px 0 0 0;
+  top: 100%;
+  left: 0;
+}
+</style>
+<body id="body">
+<nav class="navbar navbar-inverse">
+  <div class="container-fluid">
+	<button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+		<span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>                        
+     </button>
+	 <div class="collapse navbar-collapse" id="myNavbar">
+		<ul class="nav navbar-nav">
+
+		  <li><a href="projekt.html">World Cup map</a></li>
+		  <li class="active"><a href="#">Number of teams</a></li>
+		  <li><a href="nom.html">Number of matches</a></li>
+		  <li><a href="goals.html">Goals</a></li>
+		  <li><a href="aa.html">Average attendance</a></li>
+		  <li><a href="winners.html">Winners</a></li>
+		  
+		</ul>
+	</div>
+  </div>
+</nav>
+<div class="header">
+<h1  align="center">Number of teams</h1>
+ </div>
+<div class="col-sm-3" id="details" width="70 !important"></div>
+</div>
+<script type="text/javascript">
+var width = 1340;
+var height = 600;
+var offsetL = document.getElementById('body').offsetLeft+(width/2)-650;
+var offsetT =document.getElementById('body').offsetTop+(height/2)-204;
+
+var data = [
+   {
+      "goalspergame":"2.7",
+      "totalgoals":"171",
+      "numberofmatches":"64",
+      "host":"Brazil",
+      "averageattendance":"52,918",
+      "year":"2014",
+      "numberofteams":"32"
+   },
+   {
+      "goalspergame":"2.3",
+      "totalgoals":"145",
+      "numberofmatches":"64",
+      "host":"South Africa",
+      "averageattendance":"49,669",
+      "year":"2010",
+      "numberofteams":"32"
+   },
+   {
+      "goalspergame":"2.3",
+      "totalgoals":"147",
+      "numberofmatches":"64",
+      "host":"Germany",
+      "averageattendance":"52,491",
+      "year":"2006",
+      "numberofteams":"32"
+   },
+   {
+      "goalspergame":"2.5",
+      "totalgoals":"161",
+      "numberofmatches":"64",
+      "host":"Japan",
+      "averageattendance":"42,268",
+      "year":"2002",
+      "numberofteams":"32"
+   },
+   {
+      "goalspergame":"2.7",
+      "totalgoals":"171",
+      "numberofmatches":"64",
+      "host":"France",
+      "averageattendance":"43,517",
+      "year":"1998",
+      "numberofteams":"32"
+   },
+   {
+      "goals per game":"2.7",
+      "totalgoals":"141",
+      "numberofmatches":"52",
+      "host":"United States",
+      "averageattendance":"68,991",
+      "year":"1994",
+      "numberofteams":"24"
+   },
+   {
+      "goalspergame":"2.2",
+      "totalgoals":"115",
+      "numberofmatches":"52",
+      "host":"Italy",
+      "averageattendance":"48,388",
+      "year":"1990",
+      "numberofteams":"24"
+   },
+   {
+      "goalspergame":"2.5",
+      "totalgoals":"132",
+      "numberofmatches":"52",
+      "host":"Mexico",
+      "averageattendance":"46,039",
+      "year":"1986",
+      "numberofteams":"24"
+   },
+   {
+      "goalspergame":"2.8",
+      "totalgoals":"146",
+      "numberofmatches":"52",
+      "host":"Spain",
+      "averageattendance":"40,571",
+      "year":"1982",
+      "numberofteams":"24"
+   },
+   {
+      "goalspergame":"2.7",
+      "totalgoals":"102",
+      "numberofmatches":"38",
+      "host":"Argentina",
+      "averageattendance":"40,678",
+      "year":"1978",
+      "numberofteams":"16"
+   },
+   {
+      "goalspergame":"2.6",
+      "totalgoals":"97",
+      "numberofmatches":"38",
+      "host":"Germany",
+      "averageattendance":"49,098",
+      "year":"1974",
+      "numberofteams":"16"
+   },
+   {
+      "goalspergame":"3.0",
+      "totalgoals":"95",
+      "numberofmatches":"32",
+      "host":"Mexico",
+      "averageattendance":"50,124",
+      "year":"1970",
+      "numberofteams":"16"
+   },
+   {
+      "goalspergame":"2.8",
+      "totalgoals":"89",
+      "numberofmatches":"32",
+      "host":"United Kingdom",
+      "averageattendance":"48,847",
+      "year":"1966",
+      "numberofteams":"16"
+   },
+   {
+      "goalspergame":"2.8",
+      "totalgoals":"89",
+      "numberofmatches":"32",
+      "host":"Chile",
+      "averageattendance":"27,911",
+      "year":"1962",
+      "numberofteams":"16"
+   },
+   {
+      "goalspergame":"3.6",
+      "totalgoals":"126",
+      "numberofmatches":"35",
+      "host":"Sweden",
+      "averageattendance":"23,423",
+      "year":"1958",
+      "numberofteams":"16"
+   },
+   {
+      "goalspergame":"5.4",
+      "totalgoals":"140",
+      "numberofmatches":"26",
+      "host":"Switzerland",
+      "averageattendance":"29,561",
+      "year":"1954",
+      "numberofteams":"16"
+   },
+   {
+      "goalspergame":"4.0",
+      "totalgoals":"88",
+      "numberofmatches":"22",
+      "host":"Brazil",
+      "averageattendance":"47,511",
+      "year":"1950",
+      "numberofteams":"13"
+   },
+   {
+      "goalspergame":"4.7",
+      "totalgoals":"84",
+      "numberofmatches":"18",
+      "host":"France",
+      "averageattendance":"20,872",
+      "year":"1938",
+      "numberofteams":"15"
+   },
+   {
+      "goalspergame":"4.1",
+      "totalgoals":"70",
+      "numberofmatches":"17",
+      "host":"Italy",
+      "averageattendance":"21,352",
+      "year":"1934",
+      "numberofteams":"16"
+   },
+   {
+      "goalspergame":"3.9",
+      "totalgoals":"70",
+      "numberofmatches":"18",
+      "host":"Uruguay",
+      "averageattendance":"32,808",
+      "year":"1930",
+      "numberofteams":"13"
+   }
+]
+var margin = {top: 40, right: 20, bottom: 30, left: 40},
+    width = 960 - margin.left - margin.right,
+    height = 500 - margin.top - margin.bottom;
+
+var teams = d3.format("10");
+
+var x = d3.scale.ordinal()
+    .rangeRoundBands([0, width], .17);
+
+var y = d3.scale.linear()
+    .range([height, 1]);
+
+var xAxis = d3.svg.axis()
+    .scale(x)
+    .orient("bottom");
+
+var yAxis = d3.svg.axis()
+    .scale(y)
+    .orient("left")
+    .tickFormat(teams);
+
+var tip = d3.tip()
+  .attr('class', 'd3-tip')
+  .offset([-20, 0])
+  .html(function(d) {
+    return "<strong>Host: </strong> <span style='color:red'>" + d.host + "</span><br><strong>Teams:</strong><span style='color:red'>" + d.numberofteams + "</span>";
+  })
+
+var svg = d3.select("body").append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+  .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+svg.call(tip);
+
+  x.domain(data.map(function(d) { return d.year; }));
+  y.domain([0, d3.max(data, function(d) { return d.numberofteams; })]);
+
+  svg.append("g")
+      .attr("class", "x axis")
+      .attr("transform", "translate(0," + height + ")")
+      .call(xAxis);
+
+  svg.append("g")
+      .attr("class", "y axis")
+      .call(yAxis)
+    .append("text")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 6)
+      .attr("dy", ".71em")
+      .style("text-anchor", "end")
+	  .style("font-size", "10px")
+      .text("Number of teams");
+
+  svg.selectAll(".bar")
+      .data(data)
+    .enter().append("rect")
+      .attr("class", "bar")
+      .attr("x", function(d) { return x(d.year); })
+      .attr("width", x.rangeBand())
+      .attr("y", function(d) { return y(d.numberofteams); })
+      .attr("height", function(d) { return height - y(d.numberofteams); })
+      .on('mouseover', tip.show)
+      .on('mouseout', tip.hide)
+
+
+function type(d) {
+  d.numberofteams = +d.numberofteams;
+  return d;
+}
+
+</script>
+</body>
+</html>

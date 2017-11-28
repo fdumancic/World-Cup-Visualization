@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+  <head>    
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+
+<script type="text/javascript" src="http://mbostock.github.com/d3/d3.js?2.4.5"></script>
+<script src="http://d3js.org/d3.v3.min.js"></script>
+<script src="http://d3js.org/topojson.v1.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/topojson/1.1.0/topojson.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+<link rel="stylesheet" href="sheets.css" type="text/css">
+<link rel="stylesheet">
+
+
+    <style type="text/css">
+        .slice text {
+            font-size: 16pt;
+            font-family: Arial;
+        }   
+    </style>
+  </head>
+<body id="body">
+<nav class="navbar navbar-inverse">
+  <div class="container-fluid">
+	<button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+		<span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>                        
+     </button>
+	 <div class="collapse navbar-collapse" id="myNavbar">
+		<ul class="nav navbar-nav">
+
+          <li><a href="projekt.html">World Cup map</a></li>
+		  <li><a href="not.html">Number of teams</a></li>
+		  <li><a href="nom.html">Number of matches</a></li>
+		  <li><a href="goals.html">Goals</a></li>
+		  <li class="active"><a href="#">Average attendance</a></li>
+		  <li><a href="winners.html">Winners</a></li>
+
+
+		</ul>
+	</div>
+  </div>
+</nav>
+<div class="header">
+<h1  align="center">Average Attendance</h1>
+ </div>
+<div class="col-sm-4" id="details" width="70 !important"></div>
+</div>
+    <script type="text/javascript">
+
+    var canvasWidth = 600, //width
+      canvasHeight = 600,   //height
+      outerRadius = 200,   //radius
+      color = d3.scale.category20(); //builtin range of colors
+
+    var dataSet = [
+		{"legendLabel":"USA-1994", "magnitude":68991},  
+		{"legendLabel":"BR-2014", "magnitude":52918}, 
+		{"legendLabel":"GE-2006", "magnitude":52491},
+		{"legendLabel":"ME-1970", "magnitude":50124}, 
+		{"legendLabel":"SA-2010", "magnitude":49669},
+		{"legendLabel":"GE-1974", "magnitude":49098},
+		{"legendLabel":"UK-1966", "magnitude":48847}, 
+		{"legendLabel":"IT-1990", "magnitude":48388},
+		{"legendLabel":"BR-1950", "magnitude":47511}, 
+		{"legendLabel":"ME-1986", "magnitude":46039},
+		{"legendLabel":"FR-1998", "magnitude":43517}, 
+		{"legendLabel":"JA-2002", "magnitude":42268},
+		{"legendLabel":"AR-1978", "magnitude":40678},
+		{"legendLabel":"SP-1982", "magnitude":40571},
+		{"legendLabel":"UR-1930", "magnitude":32808},
+		{"legendLabel":"Swi-1954", "magnitude":29561},
+		{"legendLabel":"CH-1962", "magnitude":27911},
+		{"legendLabel":"SW-1958", "magnitude":23423},
+		{"legendLabel":"IT-1934", "magnitude":21352},
+		{"legendLabel":"FR-1938", "magnitude":20872}];
+    
+    var vis = d3.select("body")
+      .append("svg:svg") //create the SVG element inside the <body>
+        .data([dataSet]) //associate our data with the document
+        .attr("width", canvasWidth) //set the width of the canvas
+        .attr("height", canvasHeight) //set the height of the canvas
+        .append("svg:g") //make a group to hold our pie chart
+          .attr("transform", "translate(" + 1.5*outerRadius + "," + 1.5*outerRadius + ")") // relocate center of pie to 'outerRadius,outerRadius'
+
+    // This will create <path> elements for us using arc data...
+    var arc = d3.svg.arc()
+      .outerRadius(outerRadius);
+
+    var pie = d3.layout.pie() //this will create arc data for us given a list of values
+      .value(function(d) { return d.magnitude; }) // Binding each value to the pie
+      .sort( function(d) { return null; } );
+
+    // Select all <g> elements with class slice (there aren't any yet)
+    var arcs = vis.selectAll("g.slice")
+      // Associate the generated pie data (an array of arcs, each having startAngle,
+      // endAngle and value properties) 
+      .data(pie)
+      // This will create <g> elements for every "extra" data element that should be associated
+      // with a selection. The result is creating a <g> for every object in the data array
+      .enter()
+      // Create a group to hold each slice (we will have a <path> and a <text>
+      // element associated with each slice)
+      .append("svg:g")
+      .attr("class", "slice");    //allow us to style things in the slices (like text)
+
+    arcs.append("svg:path")
+      //set the color for each slice to be chosen from the color function defined above
+      .attr("fill", function(d, i) { return color(i); } )
+      //this creates the actual SVG path using the associated data (pie) with the arc drawing function
+      .attr("d", arc);
+
+    // Add a legendLabel to each arc slice...
+    arcs.append("svg:text")
+      .attr("transform", function(d) { //set the label's origin to the center of the arc
+        //we have to make sure to set these before calling arc.centroid
+        d.outerRadius = outerRadius + 50; // Set Outer Coordinate
+        d.innerRadius = outerRadius + 45; // Set Inner Coordinate
+        return "translate(" + arc.centroid(d) + ")";
+      })
+      .attr("text-anchor", "middle") //center the text on it's origin
+      .style("fill", "Purple")
+      .style("font", "bold 15px Arial")
+      .text(function(d, i) { return dataSet[i].legendLabel; }); //get the label from our original data array
+
+    // Add a magnitude value to the larger arcs, translated to the arc centroid and rotated.
+    arcs.filter(function(d) { return d.endAngle - d.startAngle > .2; }).append("svg:text")
+      .attr("dy", ".35em")
+      .attr("text-anchor", "middle")
+      //.attr("transform", function(d) { return "translate(" + arc.centroid(d) + ")rotate(" + angle(d) + ")"; })
+      .attr("transform", function(d) { //set the label's origin to the center of the arc
+        //we have to make sure to set these before calling arc.centroid
+        d.outerRadius = outerRadius; // Set Outer Coordinate
+        d.innerRadius = outerRadius/2; // Set Inner Coordinate
+        return "translate(" + arc.centroid(d) + ")rotate(" + angle(d) + ")";
+      })
+      .style("fill", "White")
+      .style("font", "bold 15px Arial")
+      .text(function(d) { return d.data.magnitude; });
+
+    // Computes the angle of an arc, converting from radians to degrees.
+    function angle(d) {
+      var a = (d.startAngle + d.endAngle) * 90 / Math.PI - 90;
+      return a > 90 ? a - 180 : a;
+    }
+
+        
+    </script>
+  </body>
+</html>
